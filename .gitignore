@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+ENV/
+
+# Environment/secrets
+.env
+.env.*
+!.env.example
+
+# Local One Rupee data
+.one_rupee/
+**/one_rupee.db
+*.db
+
+# Generated certificates
+backend/certificates/
+work/
+
+# Test/cache files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+one_rupee/.installation_id
