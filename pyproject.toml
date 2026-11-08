@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "one-rupee"
+version = "0.4.3"
+description = "A tiny, verified ₹1 Cashfree membership experience."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "cashfree_pg==6.0.1",
+    "fastapi>=0.110",
+    "qrcode[pil]>=7.4",
+    "requests>=2.31",
+    "psycopg2-binary>=2.9.9",
+    "uvicorn>=0.27",
+]
+
+[project.scripts]
+one-rupee = "one_rupee.cli:main"
+
+[tool.setuptools]
+packages = ["backend", "one_rupee"]
+
+[tool.setuptools.package-data]
+backend = ["static/*.html"]
+one_rupee = []
+
+[project.optional-dependencies]
+test = ["pytest>=8.0", "httpx>=0.27"]

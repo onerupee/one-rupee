@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>One Rupee 🪙</title>
+
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                Roboto, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #667eea 0%,
+                    #764ba2 100%
+                );
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+
+            padding: 40px 30px;
+
+            max-width: 400px;
+            width: 100%;
+
+            text-align: center;
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .coin {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1a1a2e;
+
+            margin-bottom: 8px;
+
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #555;
+
+            margin-bottom: 25px;
+        }
+
+        .name-label {
+            display: block;
+
+            text-align: left;
+
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            color: #333;
+        }
+
+        .name-input {
+            width: 100%;
+
+            padding: 14px 16px;
+
+            border: 2px solid #e5e5e5;
+
+            border-radius: 12px;
+
+            font-size: 16px;
+
+            outline: none;
+
+            margin-bottom: 18px;
+
+            transition: border-color 0.2s;
+        }
+
+        .name-input:focus {
+            border-color: #667eea;
+        }
+
+        .pay-btn {
+            background:
+                linear-gradient(
+                    135deg,
+                    #f093fb 0%,
+                    #f5576c 100%
+                );
+
+            color: white;
+
+            border: none;
+
+            padding: 16px 48px;
+
+            font-size: 20px;
+
+            font-weight: 700;
+
+            border-radius: 50px;
+
+            cursor: pointer;
+
+            transition: all 0.3s ease;
+
+            box-shadow:
+                0 4px 15px rgba(245, 87, 108, 0.4);
+
+            width: 100%;
+
+            max-width: 280px;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .pay-btn:active {
+            transform: translateY(0);
+        }
+
+        .pay-btn:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+        #status {
+            margin-top: 24px;
+
+            font-size: 16px;
+
+            color: #333;
+
+            min-height: 24px;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        .info {
+            color: #3498db;
+        }
+
+        .badge {
+            display: inline-block;
+
+            background: #f0f0f0;
+
+            color: #888;
+
+            font-size: 12px;
+
+            padding: 4px 12px;
+
+            border-radius: 20px;
+
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <div class="coin">🪙</div>
+
+        <h1>ONE RUPEE</h1>
+
+        <p class="subtitle">
+            Pay ₹1 to claim your membership.
+        </p>
+
+        <!-- NAME -->
+        <label class="name-label" for="nameInput">
+            Your name
+        </label>
+
+        <input
+            type="text"
+            id="nameInput"
+            class="name-input"
+            placeholder="Enter your name"
+            maxlength="100"
+            autocomplete="name"
+        >
+
+        <!-- PHONE -->
+        <label class="name-label" for="phoneInput">
+            Mobile number
+        </label>
+
+        <input
+            type="tel"
+            id="phoneInput"
+            class="name-input"
+            placeholder="10-digit mobile number"
+            maxlength="15"
+            minlength="10"
+            inputmode="numeric"
+            autocomplete="tel"
+        >
+
+        <!-- PAYMENT -->
+        <button
+            class="pay-btn"
+            id="payBtn"
+            onclick="payNow()"
+        >
+            Pay ₹1
+        </button>
+
+        <div id="status"></div>
+
+        <div class="badge">
+            🧪
+            <span id="environment">Sandbox</span>
+            Mode
+        </div>
+
+    </div>
+
+    <script>
+
+        const cashfreeMode = "__CASHFREE_MODE__";
+
+        const cashfree = Cashfree({
+            mode: cashfreeMode
+        });
+
+        document.getElementById("environment").textContent =
+            cashfreeMode === "sandbox"
+                ? "Sandbox"
+                : "Production";
+
+
+        const query = new URLSearchParams(
+            window.location.search
+        );
+
+
+        const customerId =
+            query.get("customer_id") ||
+            (
+                window.crypto &&
+                window.crypto.randomUUID
+
+                    ? `web_${window.crypto.randomUUID()}`
+
+                    : `web_${Date.now()}_${Math.random()
+                        .toString(16)
+                        .slice(2)}`
+            );
+
+
+        async function payNow() {
+
+            const button =
+                document.getElementById("payBtn");
+
+            const status =
+                document.getElementById("status");
+
+            const nameInput =
+                document.getElementById("nameInput");
+            const phoneInput =
+                document.getElementById("phoneInput");
+
+            const customerName = nameInput.value.trim();
+            const customerPhone = phoneInput.value.replace(/\D/g, "");
+
+
+            // Require a name
+            if (!customerName) {
+
+                status.className = "error";
+
+                status.innerText =
+                    "😂 Even the ₹1 club needs your name.";
+
+                nameInput.focus();
+
+                return;
+            }
+
+
+            if (!/^[0-9]{10,15}$/.test(customerPhone)) {
+                status.className = "error";
+                status.innerText = "Please enter a valid 10–15 digit mobile number.";
+                phoneInput.focus();
+                return;
+            }
+
+            button.disabled = true;
+
+            status.className = "info";
+
+            status.innerText =
+                "Creating your ₹1 payment... ⏳";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/create-payment",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                customer_id:
+                                    customerId,
+
+                                customer_phone:
+                                    customerPhone,
+
+                                customer_name:
+                                    customerName
+
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    console.error(
+                        "Create payment error:",
+                        data
+                    );
+
+                    status.className = "error";
+
+                    status.innerText =
+                        "❌ Unable to create payment. Please try again.";
+
+                    button.disabled = false;
+
+                    return;
+                }
+
+
+                if (!data.payment_session_id) {
+
+                    throw new Error(
+                        "Cashfree did not return a payment session id"
+                    );
+                }
+
+
+                status.className = "info";
+
+                status.innerText =
+                    "Opening secure Cashfree checkout... 💳";
+
+
+                cashfree.checkout({
+
+                    paymentSessionId:
+                        data.payment_session_id
+
+                });
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Payment error:",
+                    error
+                );
+
+                status.className = "error";
+
+                status.innerText =
+                    "❌ Something went wrong. Please try again.";
+
+                button.disabled = false;
+            }
+        }
+
+    </script>
+
+</body>
+</html>
