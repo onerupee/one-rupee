@@ -155,6 +155,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(config.base_url, "http://192.168.50.8:8123")
         self.assertEqual(config.server_port, 8000)
         self.assertEqual(config.cashfree_env, "sandbox")
+        self.assertEqual(config.certificate_storage, "local")
 
     def test_rejects_invalid_cashfree_env(self):
         with patch.dict(os.environ, {
