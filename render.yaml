@@ -1,0 +1,57 @@
+# =============================================================
+# One Rupee — Render Blueprint
+# =============================================================
+# Deploy with: Render Dashboard → New → Blueprint → connect repo.
+#
+# Variables marked sync: false are Render-managed secrets.
+# Set their values in the Render Dashboard → Environment tab.
+# =============================================================
+
+services:
+  - type: web
+    name: one-rupee
+    runtime: docker
+    plan: starter
+    region: singapore
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      # -------------------------------------------------------
+      # Cashfree Payment Gateway
+      # -------------------------------------------------------
+      - key: CASHFREE_APP_ID
+        sync: false
+      - key: CASHFREE_SECRET_KEY
+        sync: false
+      - key: CASHFREE_ENV
+        value: sandbox
+
+      # -------------------------------------------------------
+      # Server / Public URL
+      # -------------------------------------------------------
+      # Set ONE_RUPEE_BASE_URL to the Render service URL once
+      # known (e.g. https://one-rupee.onrender.com).
+      - key: ONE_RUPEE_BASE_URL
+        sync: false
+      - key: ONE_RUPEE_ENV
+        value: production
+
+      # -------------------------------------------------------
+      # Supabase PostgreSQL
+      # -------------------------------------------------------
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+      # -------------------------------------------------------
+      # Certificate Storage (Supabase Storage, private bucket)
+      # -------------------------------------------------------
+      - key: CERTIFICATE_STORAGE
+        value: supabase
+      - key: SUPABASE_CERTIFICATE_BUCKET
+        value: certificates
+      - key: SUPABASE_CERTIFICATE_PUBLIC
+        value: "false"

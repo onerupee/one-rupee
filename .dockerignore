@@ -1,0 +1,41 @@
+# Version control
+.git
+.github
+
+# Local data and databases
+.one_rupee/
+*.db
+work/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+one_rupee.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# Tests (not needed in production image)
+tests/
+
+# Documentation and non-runtime files
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
