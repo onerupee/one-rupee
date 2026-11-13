@@ -1,9 +1,10 @@
-"""Printable one-page A4 certificates for verified One Rupee members."""
+"""Printable one-page A4 PDF certificates for verified One Rupee members."""
 
 from datetime import datetime
 from html import escape
 from pathlib import Path
 import re
+from playwright.sync_api import sync_playwright
 
 
 CERTIFICATE_DIR = Path.home() / ".one_rupee" / "certificates"
@@ -14,7 +15,7 @@ def generate_certificate(
     order_id: str,
     name: str = None,
 ) -> str:
-    """Create the printable HTML certificate for one member."""
+    """Create a printable A4 landscape PDF certificate."""
 
     CERTIFICATE_DIR.mkdir(
         parents=True,
@@ -29,18 +30,41 @@ def generate_certificate(
 
     certificate_path = (
         CERTIFICATE_DIR
-        / f"member-{member_id}-{safe_order_id}.html"
+        / f"member-{member_id}-{safe_order_id}.pdf"
     )
 
-    if not certificate_path.exists():
-        certificate_path.write_text(
-            _certificate_html(
-                member_id,
-                order_id,
-                name,
-            ),
-            encoding="utf-8",
-        )
+    if certificate_path.exists():
+        return str(certificate_path)
+
+    html_content = _certificate_html(
+        member_id,
+        order_id,
+        name,
+    )
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+
+        try:
+            page = browser.new_page()
+
+            page.set_content(
+                html_content,
+                wait_until="networkidle",
+            )
+
+            page.evaluate("document.fonts.ready")
+
+            page.pdf(
+                path=str(certificate_path),
+                format="A4",
+                landscape=True,
+                print_background=True,
+                prefer_css_page_size=True,
+            )
+
+        finally:
+            browser.close()
 
     return str(certificate_path)
 
@@ -1140,7 +1164,7 @@ h1 {{
 
 
     </div>
-  
+
 
     <button
         class="print-button"

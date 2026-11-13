@@ -92,7 +92,7 @@ def load_runtime_config():
     supabase_anon_key = os.getenv("SUPABASE_ANON_KEY", "").strip()
     supabase_service_role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     database_url = os.getenv("DATABASE_URL", "").strip()
-    certificate_storage = os.getenv("CERTIFICATE_STORAGE", "local").strip()
+    certificate_storage = os.getenv("CERTIFICATE_STORAGE", "supabase").strip().lower()
     app_env = os.getenv("ONE_RUPEE_ENV", "development").strip()
 
     if not app_id:
@@ -131,7 +131,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip()
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "").strip()
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
-CERTIFICATE_STORAGE = os.getenv("CERTIFICATE_STORAGE", "local").strip()
+CERTIFICATE_STORAGE = os.getenv("CERTIFICATE_STORAGE", "supabase").strip().lower()
 ENVIRONMENT = os.getenv("ONE_RUPEE_ENV", "development").strip()
 
 try:

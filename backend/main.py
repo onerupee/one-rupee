@@ -527,15 +527,16 @@ def serve_certificate(filename: str):
             detail="Certificate not found.",
         )
 
-    if certificate_path.suffix.lower() != ".html":
+    if certificate_path.suffix.lower() != ".pdf":
         raise HTTPException(
-            status_code=404,
-            detail="Invalid certificate.",
+        status_code=404,
+        detail="Invalid certificate.",
         )
 
     return FileResponse(
         path=certificate_path,
-        media_type="text/html",
+        media_type="application/pdf",
+        filename=safe_filename,
     )
 
 @app.get("/membership-status/{customer_id}")
@@ -572,8 +573,11 @@ def certificate(order_id: str):
     certificate_path = ensure_certificate(payment)
     if str(certificate_path).startswith(("https://", "http://")):
         return RedirectResponse(certificate_path)
-    return FileResponse(certificate_path, media_type="text/html")
-
+    return FileResponse(
+        certificate_path,
+        media_type="application/pdf",
+        filename=Path(certificate_path).name,
+    )
 
 class PaymentVerificationError(RuntimeError):
     """A stored local receipt could not be verified with Cashfree."""
@@ -701,7 +705,7 @@ def ensure_certificate(payment):
     headers = {
         "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
         "apikey": SUPABASE_SERVICE_ROLE_KEY,
-        "Content-Type": "text/html; charset=utf-8",
+        "Content-Type": "application/pdf",
         "x-upsert": "true",
     }
     with open(certificate_path, "rb") as certificate_file:

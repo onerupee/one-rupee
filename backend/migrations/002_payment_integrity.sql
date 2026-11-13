@@ -31,11 +31,6 @@ END $$;
 ALTER TABLE payments
     VALIDATE CONSTRAINT chk_payment_activation_consistency;
 
--- Fast lookup for the public membership status polling endpoint.
-CREATE INDEX IF NOT EXISTS idx_payments_customer_activated
-    ON payments (customer_id, activated_at DESC)
-    WHERE member_id IS NOT NULL;
-
 -- Keep member identifiers monotonic after imports/manual data restoration.
 -- SERIAL sequences are normally correct; this safely advances the sequence
 -- if imported rows have a larger ID than its current value.

@@ -396,25 +396,31 @@ class TestVerifiedFlowAndIdempotency(_BackendPatchMixin, unittest.TestCase):
 
 class TestCertificateGeneration(unittest.TestCase):
 
-    def test_generates_valid_html_certificate(self):
+    def test_generates_valid_pdf_certificate(self):
         with TemporaryDirectory() as temp_dir:
             original_cert_dir = certificates.CERTIFICATE_DIR
             certificates.CERTIFICATE_DIR = Path(temp_dir) / "certificates"
             try:
+                order_id = "one_rupee_test12345678901234"
                 path = certificates.generate_certificate(
                     member_id=42,
-                    order_id="one_rupee_test12345678901234",
+                    order_id=order_id,
                     name="Test User",
                 )
-                self.assertTrue(Path(path).is_file())
-                content = Path(path).read_text(encoding="utf-8")
+
+                pdf_path = Path(path)
+                self.assertTrue(pdf_path.is_file())
+                self.assertTrue(pdf_path.read_bytes().startswith(b"%PDF-"))
+
+                content = certificates._certificate_html(
+                    42, order_id, "Test User"
+                )
                 self.assertIn("Test User", content)
                 self.assertIn("42", content)
                 self.assertIn("One Rupee", content)
                 self.assertIn("Certificate", content)
             finally:
                 certificates.CERTIFICATE_DIR = original_cert_dir
-
     def test_certificate_is_idempotent(self):
         with TemporaryDirectory() as temp_dir:
             original_cert_dir = certificates.CERTIFICATE_DIR
@@ -432,7 +438,14 @@ class TestCertificateGeneration(unittest.TestCase):
             certificates.CERTIFICATE_DIR = Path(temp_dir) / "certificates"
             try:
                 path = certificates.generate_certificate(99, "order_xyz", None)
-                content = Path(path).read_text(encoding="utf-8")
+
+                pdf_path = Path(path)
+                self.assertTrue(pdf_path.is_file())
+                self.assertTrue(pdf_path.read_bytes().startswith(b"%PDF-"))
+
+                content = certificates._certificate_html(
+                    99, "order_xyz", None
+                )
                 self.assertIn("MYSTERY MEMBER", content)
             finally:
                 certificates.CERTIFICATE_DIR = original_cert_dir
@@ -678,8 +691,8 @@ class TestSecurity(_BackendPatchMixin, unittest.TestCase):
 
     def test_existing_certificate_is_uploaded_when_storage_enabled(self):
         with TemporaryDirectory() as directory:
-            certificate = Path(directory) / "member-1.html"
-            certificate.write_text("<html>verified member</html>", encoding="utf-8")
+            certificate = Path(directory) / "member-1.pdf"
+            certificate.write_bytes(b"%PDF-1.4\nTest PDF content")
             payment = {
                 "member_id": 1,
                 "order_id": "one_rupee_test_order",
