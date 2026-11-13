@@ -30,6 +30,10 @@ RUN mkdir -p backend one_rupee \
 # ------------------------------------------------------------------
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libatomic1 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN playwright install --with-deps chromium
 
 # ------------------------------------------------------------------
